@@ -1,6 +1,6 @@
 from fastapi import FastAPI
 
-from apps.routers.info import router as info_router
+from apps.info.router import router as info_router
 from settings import settings
 
 
