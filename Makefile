@@ -14,4 +14,3 @@ build:
 
 bash:
 	${DC} exec -it ${BACKEND_CONTAINER} bash
-	
