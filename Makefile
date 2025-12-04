@@ -1,7 +1,7 @@
 DC = docker compose
 BACKEND_CONTAINER = backend1
 
-PHONY: up down build bash
+PHONY: up down build bash logs
 
 up:
 	${DC} up -d
@@ -14,3 +14,6 @@ build:
 
 bash:
 	${DC} exec -it ${BACKEND_CONTAINER} bash
+
+logs:
+	${DC} logs ${BACKEND_CONTAINER}
