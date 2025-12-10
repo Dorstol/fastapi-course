@@ -10,17 +10,9 @@ router = APIRouter(
 )
 
 
-@router.post(
-    "/create", 
-    response_model=UserCreated, 
-    status_code=status.HTTP_201_CREATED
-)
+@router.post("/create", response_model=UserCreated, status_code=status.HTTP_201_CREATED)
 async def create_user(
-    new_user: UserCreate, 
-    session: AsyncSession = Depends(get_async_session)
+    new_user: UserCreate, session: AsyncSession = Depends(get_async_session)
 ) -> UserCreated:
-    created_user = await user_manager.create_user(
-        new_user=new_user,
-        session=session
-    )
+    created_user = await user_manager.create_user(new_user=new_user, session=session)
     return created_user

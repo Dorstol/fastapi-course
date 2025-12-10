@@ -1,21 +1,42 @@
 from datetime import datetime
 
-from sqlalchemy.ext.asyncio import AsyncAttrs, create_async_engine, async_sessionmaker
+from sqlalchemy.ext.asyncio import (
+    AsyncAttrs,
+    create_async_engine,
+    async_sessionmaker,
+    AsyncSession,
+)
 from sqlalchemy.orm import DeclarativeBase, declared_attr
 from sqlalchemy.orm import Mapped, mapped_column
 from sqlalchemy.sql import func
 
 from settings import settings
 
-engine = create_async_engine(settings.database_async_url)
-async_session_maker = async_sessionmaker(engine, expire_on_commit=False)
+engine = create_async_engine(
+    settings.database_async_url,
+    pool_size=10,
+    max_overflow=10,
+    pool_pre_ping=True,
+    pool_recycle=1800,
+)
+async_session_maker = async_sessionmaker(
+    engine,
+    expire_on_commit=False,
+    class_=AsyncSession,
+)
 
 
 class Base(AsyncAttrs, DeclarativeBase):
     __abstract__ = True
 
-    id: Mapped[int] = mapped_column(primary_key=True, autoincrement=True, )
-    created_at: Mapped[datetime] = mapped_column(default=func.now(), nullable=False, )
+    id: Mapped[int] = mapped_column(
+        primary_key=True,
+        autoincrement=True,
+    )
+    created_at: Mapped[datetime] = mapped_column(
+        default=func.now(),
+        nullable=False,
+    )
 
     @declared_attr.directive
     def __tablename__(cls) -> str:

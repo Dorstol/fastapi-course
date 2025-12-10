@@ -1,8 +1,14 @@
+import sentry_sdk
 from fastapi import FastAPI, Request
 from scalar_fastapi import get_scalar_api_reference
-
+from fastapi.responses import ORJSONResponse
 from apps.info.router import router as info_router
 from settings import settings
+
+sentry_sdk.init(
+    dsn=settings.SENTRY_DSN,
+    send_default_pii=True,
+)
 
 
 def get_application() -> FastAPI:
@@ -10,6 +16,7 @@ def get_application() -> FastAPI:
         title=settings.APP_NAME,
         debug=settings.DEBUG,
         root_path="/api",
+        default_response_class=ORJSONResponse,
     )
 
     if settings.DEBUG:

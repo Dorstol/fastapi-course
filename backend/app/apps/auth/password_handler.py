@@ -8,7 +8,10 @@ class PasswordHandler:
     async def get_password_hash(cls, password: str) -> str:
         return cls.pwd_context.hash(password)
 
-
     @classmethod
-    async def verify_password(cls, plaint_password: str, hashed_password:str,) -> bool:
+    async def verify_password(
+        cls,
+        plaint_password: str,
+        hashed_password: str,
+    ) -> bool:
         return cls.pwd_context.verify(plaint_password, hashed_password)

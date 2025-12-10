@@ -23,10 +23,10 @@ class UserCRUDManager(BaseCRUDManager):
 
         if existing_user:
             raise HTTPException(
-                status_code=status.HTTP_409_CONFLICT, 
-                detail="User with this email already exists"
+                status_code=status.HTTP_409_CONFLICT,
+                detail="User with this email already exists",
             )
-        
+
         hasshed_password = await PasswordHandler.get_password_hash(new_user.password)
         user = await self.create(
             session=session,
@@ -35,5 +35,6 @@ class UserCRUDManager(BaseCRUDManager):
             hashed_password=hasshed_password,
         )
         return user
+
 
 user_manager = UserCRUDManager()
