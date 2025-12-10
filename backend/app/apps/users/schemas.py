@@ -39,7 +39,7 @@ class UserPassword(BaseModel):
 class BaseUser(BaseModel):
     email: EmailStr = Field(description="User email", example="user@example.com")
     name: Annotated[str, StringConstraints(
-        pattern=pattern=r"^[0-9a-zA-Zа-яА-ЯїЇяЯєЄіІґҐ_.'\- ]+$",
+        pattern=r"^[0-9a-zA-Zа-яА-ЯїЇяЯєЄіІґҐ_.'\- ]+$",
         min_length=2,
         max_length=32,
         strip_whitespace=True,
