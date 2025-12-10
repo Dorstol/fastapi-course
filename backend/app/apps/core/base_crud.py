@@ -10,18 +10,11 @@ from apps.core.base import Base
 class BaseCRUDManager(ABC):
     model: type[Base] = None
 
-
     @abstractmethod
     def __init__(self):
         pass
 
-
-    async def create(
-        self, 
-        *, 
-        session: AsyncSession, 
-        **kwargs
-    ) -> Optional[Base]:
+    async def create(self, *, session: AsyncSession, **kwargs) -> Optional[Base]:
         instance = self.model(**kwargs)
         session.add(instance)
 
@@ -31,16 +24,14 @@ class BaseCRUDManager(ABC):
         except Exception as e:
             await session.rollback()
             raise HTTPException(
-                status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, 
-                detail=str(e)
+                status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail=str(e)
             )
-
 
     async def get(
         self,
-        *, 
-        session: AsyncSession, 
-        field: InstrumentedAttribute, 
+        *,
+        session: AsyncSession,
+        field: InstrumentedAttribute,
         field_value: Any,
     ) -> Optional[Base]:
         query = select(self.model).where(field == field_value)

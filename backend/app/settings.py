@@ -3,6 +3,10 @@ from functools import lru_cache
 from pydantic_settings import BaseSettings
 
 
+class SentrySettings(BaseSettings):
+    SENTRY_DSN: str
+
+
 class CoreSettings(BaseSettings):
     APP_NAME: str = "Title"
     DEBUG: bool = False
@@ -17,12 +21,10 @@ class PostgreSQLSettings(BaseSettings):
 
     @property
     def database_async_url(self) -> str:
-        return (
-            f"postgresql+asyncpg://{self.PGUSER}:{self.PGPASSWORD}@{self.PGHOST}:{self.PGPORT}/{self.PGDATABASE}"
-        )
+        return f"postgresql+asyncpg://{self.PGUSER}:{self.PGPASSWORD}@{self.PGHOST}:{self.PGPORT}/{self.PGDATABASE}"
 
 
-class Settings(CoreSettings, PostgreSQLSettings):
+class Settings(CoreSettings, PostgreSQLSettings, SentrySettings):
     pass
 
 

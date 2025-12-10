@@ -20,3 +20,8 @@ async def get_backend_info() -> BackendInfo:
 async def get_database_url() -> DatabaseInfo:
     """Get current database url"""
     return {"database": settings.database_async_url}
+
+
+@router.get("/sentry-debug")
+async def trigger_error():
+    pass
