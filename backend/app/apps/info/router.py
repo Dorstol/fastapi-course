@@ -13,7 +13,7 @@ router = APIRouter(
 @router.get("/backend", response_model=BackendInfo)
 async def get_backend_info() -> BackendInfo:
     """Get current backend info"""
-    return {"backend": socket.gethostname(), "random_field": "random_value"}
+    return {"backend": socket.gethostname()}
 
 
 @router.get("/database_url", response_model=DatabaseInfo)
@@ -24,4 +24,4 @@ async def get_database_url() -> DatabaseInfo:
 
 @router.get("/sentry-debug")
 async def trigger_error():
-    pass
+    division_by_zero = 1 / 0  # noqa
