@@ -4,6 +4,7 @@ site_name: FastAPI-Course
 nav:
   - About: index.md
   - Examples: examples.md
+  - Logging: logging.md
 
 theme:
   name: material
