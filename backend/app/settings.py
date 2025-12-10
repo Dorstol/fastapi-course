@@ -2,6 +2,10 @@ from functools import lru_cache
 
 from pydantic_settings import BaseSettings
 
+class BetterStackSettings(BaseSettings):
+    BETTER_STACK_TOKEN: str
+    BETTER_STACK_HOST: str
+
 
 class SentrySettings(BaseSettings):
     SENTRY_DSN: str
@@ -24,7 +28,7 @@ class PostgreSQLSettings(BaseSettings):
         return f"postgresql+asyncpg://{self.PGUSER}:{self.PGPASSWORD}@{self.PGHOST}:{self.PGPORT}/{self.PGDATABASE}"
 
 
-class Settings(CoreSettings, PostgreSQLSettings, SentrySettings):
+class Settings(CoreSettings, PostgreSQLSettings, SentrySettings, BetterStackSettings):
     pass
 
 

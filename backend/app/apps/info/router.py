@@ -4,6 +4,8 @@ from fastapi import APIRouter
 from .schemas import BackendInfo, DatabaseInfo
 from settings import settings
 
+from apps.services.betterstack_service import betterstack_logger
+
 router = APIRouter(
     prefix="/info",
     tags=["info"],
@@ -13,6 +15,24 @@ router = APIRouter(
 @router.get("/backend", response_model=BackendInfo)
 async def get_backend_info() -> BackendInfo:
     """Get current backend info"""
+
+    betterstack_logger.info(
+        "User logged in",
+        extra={
+            "user_id": 123,
+            "debug_info": {"function": "get_backend_info", "status": "OK"},
+        }
+    )
+
+    betterstack_logger.error(
+        "User logged in",
+        extra={
+            "user_id": 321,
+            "debug_info": {"function": "get_backend_info", "status": "ERROR"},
+        }
+    )
+
+    
     return {"backend": socket.gethostname()}
 
 
