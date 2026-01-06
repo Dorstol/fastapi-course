@@ -2,6 +2,12 @@ from functools import lru_cache
 
 from pydantic_settings import BaseSettings
 
+class JWTSettings(BaseSettings):
+    JWT_SECRET_KEY: str
+    JWT_ALGORITHM: str
+    ACCESS_TOKEN_LIFETIME_MINUTES: int = 5
+    REFRESH_TOKEN_LIFETIME_MINUTES: int = 60
+
 class BetterStackSettings(BaseSettings):
     BETTER_STACK_TOKEN: str
     BETTER_STACK_HOST: str
@@ -28,7 +34,13 @@ class PostgreSQLSettings(BaseSettings):
         return f"postgresql+asyncpg://{self.PGUSER}:{self.PGPASSWORD}@{self.PGHOST}:{self.PGPORT}/{self.PGDATABASE}"
 
 
-class Settings(CoreSettings, PostgreSQLSettings, SentrySettings, BetterStackSettings):
+class Settings(
+    CoreSettings,
+    PostgreSQLSettings,
+    SentrySettings,
+    BetterStackSettings,
+    JWTSettings
+):
     pass
 
 
