@@ -1,3 +1,7 @@
+import datetime as dt
+import jwt
+
+from uuid import uuid4
 from apps.auth.schemas import LoginResponseShema
 from apps.auth.password_handler import PasswordHandler
 
@@ -39,11 +43,44 @@ class AuthHandler:
                 detail="Invalid password",
                 status_code=status.HTTP_401_UNAUTHORIZED,
             )
-        return LoginResponseSchema(
-            access_token="access token",
-            refresh_token="refresh token",
-            expires_in=self.access_token_lifetime,
+        tokens_response = await self.generate_tokens(user)
+        return tokens_response
+
+    async def generate_tokens(self, user: User) -> LoginResponseShema:
+        access_token_payload = {
+            "sub": str(user.id),
+            "email": user.email
+        }
+        access_token = await self.generate_token(
+            payload=access_token_payload,
+            expire_minutes=self.access_token_lifetime,
         )
 
+        refresh_token_payload = {
+            "sub": str(user.id),
+            "email": user.email,
+            "key": uuid4().hex,
+        }
+        refresh_token = await self.generate_token(
+            payload=refresh_token_payload,
+            expire_minutes=self.refresh_token_lifetime,
+        )
+
+        return LoginResponseShema(
+            access_token=access_token,
+            refresh_token=refresh_token,
+            expires_in=self.access_token_lifetime * 60,
+        )
+
+    async def generate_token(self, payload: dict, expire_minutes: int) -> str:
+        now = dt.datetime.now()
+        token_expires_at = dt.timedelta(minutes=expire_minutes)
+        time_payload = {
+            "exp": now + token_expires_at,
+            "iat": now,
+        }
+        payload.update(time_payload)
+        token_ = jwt.encode(payload, self.secret_key, self.algorithm)
+        return token_
 
 auth_handler = AuthHandler()

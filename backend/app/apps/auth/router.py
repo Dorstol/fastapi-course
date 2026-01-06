@@ -1,5 +1,5 @@
-from app.apps.auth.auth_handler import auth_handler
-from app.apps.auth.schemas import LoginResponseShema
+from apps.auth.auth_handler import auth_handler
+from apps.auth.schemas import LoginResponseShema
 from fastapi import APIRouter, Depends, HTTPException
 from fastapi.security import OAuth2PasswordRequestForm
 from sqlalchemy.ext.asyncio import AsyncSession
