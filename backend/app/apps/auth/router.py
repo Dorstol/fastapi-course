@@ -1,3 +1,5 @@
+from app.apps.auth.auth_handler import auth_handler
+from app.apps.auth.schemas import LoginResponseShema
 from fastapi import APIRouter, Depends, HTTPException
 from fastapi.security import OAuth2PasswordRequestForm
 from sqlalchemy.ext.asyncio import AsyncSession
@@ -15,8 +17,9 @@ router = APIRouter(
 async def user_login(
     data: OAuth2PasswordRequestForm = Depends(),
     session: AsyncSession = Depends(get_async_session),
-):
-    user = await user_manager.get(field=User.email, field_value=data.username, session=session,)
-    if not user:
-        raise HTTPException(detail="User not found", status_code=404,)
-    return {"data": [data.username, data.password]}
+) -> LoginResponseShema:
+    login_response: LoginResponseShema = await auth_handler.get_login_token_pairs(
+        session=session,
+        data=data,
+    )
+    return login_response
