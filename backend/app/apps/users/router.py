@@ -3,6 +3,8 @@ from apps.users.schemas import UserCreate, UserCreated
 from sqlalchemy.ext.asyncio import AsyncSession
 from apps.core.dependencies import get_async_session
 from apps.users.crud import user_manager
+from apps.auth.dependencies import get_current_user
+from apps.users.models import User
 
 router = APIRouter(
     prefix="/users",
@@ -10,9 +12,6 @@ router = APIRouter(
 )
 
 
-@router.post("/create", response_model=UserCreated, status_code=status.HTTP_201_CREATED)
-async def create_user(
-    new_user: UserCreate, session: AsyncSession = Depends(get_async_session)
-) -> UserCreated:
-    created_user = await user_manager.create_user(new_user=new_user, session=session)
-    return created_user
+@router.get("/user-info")
+async def user_info(user: User = Depends(get_current_user)) -> UserCreated:
+    return UserCreated.from_orm(user)

@@ -1,17 +1,25 @@
 from apps.auth.auth_handler import auth_handler
 from apps.auth.schemas import LoginResponseShema
-from fastapi import APIRouter, Depends, HTTPException
+from fastapi import APIRouter, Depends, HTTPException, status
 from fastapi.security import OAuth2PasswordRequestForm
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from apps.core.dependencies import get_async_session
 from apps.users.crud import user_manager
 from apps.users.models import User
+from apps.users.schemas import UserCreate, UserCreated
 
 router = APIRouter(
     prefix="/auth",
     tags=["Auth"],
 )
+
+@router.post("/create", response_model=UserCreated, status_code=status.HTTP_201_CREATED)
+async def create_user(
+    new_user: UserCreate, session: AsyncSession = Depends(get_async_session)
+) -> UserCreated:
+    created_user = await user_manager.create_user(new_user=new_user, session=session)
+    return created_user
 
 @router.post("/login")
 async def user_login(
@@ -23,3 +31,4 @@ async def user_login(
         data=data,
     )
     return login_response
+    
