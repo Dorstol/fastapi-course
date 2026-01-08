@@ -1,9 +1,10 @@
+from apps.users.constants import UserPermissionsEnum
 from fastapi import APIRouter, status, Depends, Path
 from apps.users.schemas import UserCreate, UserCreated
 from sqlalchemy.ext.asyncio import AsyncSession
 from apps.core.dependencies import get_async_session
 from apps.users.crud import user_manager
-from apps.auth.dependencies import get_current_user, get_admin_user
+from apps.auth.dependencies import get_current_user, require_permissions
 from apps.users.models import User
 
 router = APIRouter(
@@ -17,7 +18,7 @@ async def user_info(user: User = Depends(get_current_user)) -> UserCreated:
     return UserCreated.from_orm(user)
 
 
-@router.get("/{id}", dependencies=[Depends(get_admin_user)])
+@router.get("/{id}", dependencies=[Depends(require_permissions([UserPermissionsEnum.CAN_SEE_USERS]))],)
 async def get_user(
     user_id: int = Path(..., description="Id of the user", ge=1, alias="id",),
     session: AsyncSession = Depends(get_async_session),

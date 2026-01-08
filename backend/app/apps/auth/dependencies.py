@@ -3,6 +3,8 @@ from apps.users.crud import User, user_manager
 from fastapi import Depends, HTTPException, status
 from fastapi.security import OAuth2PasswordBearer
 from sqlalchemy.ext.asyncio import AsyncSession
+from enum import StrEnum
+from typing import Callable
 
 from .auth_handler import auth_handler
 
@@ -35,3 +37,22 @@ async def get_admin_user(
             status_code=status.HTTP_403_FORBIDDEN,
             detail="Admin user is required."
         )
+
+
+def require_permissions(required_permissions: list[StrEnum]) -> Callable:
+    async def dependency(user: User = Depends(get_current_user)) -> User:
+        if user.is_admin:
+            return user
+        user_permissions = set(user.permissions)
+        required_permissions_set: set[str] = {
+            perm.value for perm in required_permissions
+        }
+
+        if required_permissions_set.issubset(user_permissions):
+            return user
+        
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail=f"Permissions {', '.join(required_permissions_set)} required",
+        )
+    return dependency
