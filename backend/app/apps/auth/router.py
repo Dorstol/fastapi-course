@@ -1,6 +1,6 @@
 from apps.auth.auth_handler import auth_handler
 from apps.auth.schemas import LoginResponseShema
-from fastapi import APIRouter, Depends, HTTPException, status
+from fastapi import APIRouter, Depends, HTTPException, status, Header
 from fastapi.security import OAuth2PasswordRequestForm
 from sqlalchemy.ext.asyncio import AsyncSession
 
@@ -31,4 +31,15 @@ async def user_login(
         data=data,
     )
     return login_response
-    
+
+
+@router.post("/refresh")
+async def refresh_user_token(
+    refresh_token: str = Header(alias="X-Refresh-Token"),
+    session: AsyncSession = Depends(get_async_session),
+) -> LoginResponseShema:
+    token_pair = await auth_handler.get_refresh_token_pair(
+        refresh_token,
+        session,
+    )
+    return token_pair
