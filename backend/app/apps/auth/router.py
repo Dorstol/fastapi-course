@@ -1,6 +1,7 @@
+from apps.auth.dependencies import get_current_user
 from apps.auth.auth_handler import auth_handler
-from apps.auth.schemas import LoginResponseShema
-from fastapi import APIRouter, Depends, HTTPException, status, Header
+from apps.auth.schemas import LoginResponseShema, ForceLogoutSchema
+from fastapi import APIRouter, Depends, status, Header
 from fastapi.security import OAuth2PasswordRequestForm
 from sqlalchemy.ext.asyncio import AsyncSession
 
@@ -8,6 +9,7 @@ from apps.core.dependencies import get_async_session
 from apps.users.crud import user_manager
 from apps.users.models import User
 from apps.users.schemas import UserCreate, UserCreated
+
 
 router = APIRouter(
     prefix="/auth",
@@ -43,3 +45,16 @@ async def refresh_user_token(
         session,
     )
     return token_pair
+
+
+@router.post("/force-login", status_code=status.HTTP_204_NO_CONTENT)
+async def force_logout(
+    user: User = Depends(get_current_user),
+    session: AsyncSession = Depends(get_async_session),
+):
+    await user_manager.patch(
+        instance_id=user.id,
+        session=session,
+        data_to_patch=ForceLogoutSchema(),
+        exclude_unset=False,
+    )

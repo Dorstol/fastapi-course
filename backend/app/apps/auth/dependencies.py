@@ -26,6 +26,12 @@ async def get_current_user(
             detail="User not found",
             status_code=status.HTTP_404_NOT_FOUND,
         )
+    
+    if user.use_token_since and user.use_token_since > payload["iat"]:
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED, detail="User forced logout"
+        )
+
     return user
 
 
