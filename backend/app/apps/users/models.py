@@ -1,7 +1,8 @@
+import datetime as dt
+
 from sqlalchemy import String, text
 from sqlalchemy.orm import Mapped, mapped_column
 from sqlalchemy.dialects.postgresql import ARRAY
-
 from apps.core.base import Base
 
 from .constants import UserPermissionsEnum
@@ -17,3 +18,4 @@ class User(Base):
         nullable=False,
         server_default=text("'{CAN_SELF_DELETE}'::text[]"),
     )
+    use_token_since: Mapped[dt.datetime] = mapped_column(nullable=True,)
