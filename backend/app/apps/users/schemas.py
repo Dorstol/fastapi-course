@@ -62,4 +62,6 @@ class UserCreate(BaseUser, UserPassword):
 
 
 class UserCreated(BaseUser, IdSchema):
-    pass
+    model_config = {
+        "from_attributes": True,
+    }

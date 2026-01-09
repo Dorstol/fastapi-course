@@ -8,7 +8,7 @@ from apps.services.betterstack_service import betterstack_logger
 
 router = APIRouter(
     prefix="/info",
-    tags=["info"],
+    tags=["Info"],
 )
 
 

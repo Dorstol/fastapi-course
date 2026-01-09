@@ -11,7 +11,7 @@ class PasswordHandler:
     @classmethod
     async def verify_password(
         cls,
-        plaint_password: str,
+        plain_password: str,
         hashed_password: str,
     ) -> bool:
-        return cls.pwd_context.verify(plaint_password, hashed_password)
+        return cls.pwd_context.verify(plain_password, hashed_password)
