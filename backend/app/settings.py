@@ -33,13 +33,20 @@ class PostgreSQLSettings(BaseSettings):
     def database_async_url(self) -> str:
         return f"postgresql+asyncpg://{self.PGUSER}:{self.PGPASSWORD}@{self.PGHOST}:{self.PGPORT}/{self.PGDATABASE}"
 
+class RedisSettings(BaseSettings):
+    REDIS_HOST: str
+    REDIS_PORT: int
+    REDIS_USER: str = "default"
+    REDIS_PASSWORD: str
+    REDIS_DATABASE: int = 0
 
 class Settings(
     CoreSettings,
     PostgreSQLSettings,
     SentrySettings,
     BetterStackSettings,
-    JWTSettings
+    JWTSettings,
+    RedisSettings,
 ):
     pass
 
