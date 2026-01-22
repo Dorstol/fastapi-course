@@ -1,8 +1,11 @@
-from fastapi import APIRouter, status, Depends
+from apps.users.constants import UserPermissionsEnum
+from fastapi import APIRouter, status, Depends, Path
 from apps.users.schemas import UserCreate, UserCreated
 from sqlalchemy.ext.asyncio import AsyncSession
 from apps.core.dependencies import get_async_session
 from apps.users.crud import user_manager
+from apps.auth.dependencies import get_current_user, require_permissions
+from apps.users.models import User
 
 router = APIRouter(
     prefix="/users",
@@ -10,9 +13,22 @@ router = APIRouter(
 )
 
 
-@router.post("/create", response_model=UserCreated, status_code=status.HTTP_201_CREATED)
-async def create_user(
-    new_user: UserCreate, session: AsyncSession = Depends(get_async_session)
+@router.get("/user-info")
+async def user_info(user: User = Depends(get_current_user)) -> UserCreated:
+    return UserCreated.from_orm(user)
+
+
+@router.get("/{id}", dependencies=[Depends(require_permissions([UserPermissionsEnum.CAN_SEE_USERS]))],)
+async def get_user(
+    user_id: int = Path(..., description="Id of the user", ge=1, alias="id",),
+    session: AsyncSession = Depends(get_async_session),
 ) -> UserCreated:
-    created_user = await user_manager.create_user(new_user=new_user, session=session)
-    return created_user
+    user: User | None = await user_manager.get(
+        session=session, field_value=user_id, field=User.id
+    )
+    if not user:
+        raise HTTPException(
+            detail="User with given email not found",
+            status_code=status.HTTP_404_NOT_FOUND,
+        )
+    return UserCreated.from_orm(user)
