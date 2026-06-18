@@ -1,14 +1,15 @@
 import uuid
 from typing import Annotated
 
-from apps.auth.dependencies import require_permissions
+from apps.auth.dependencies import User, get_current_user, require_permissions
 from apps.core.dependencies import get_async_session
 from apps.core.schemas import SearchParamsSchema
-from apps.products.crud import category_manager, product_manager
+from apps.products.crud import category_manager, order_manager, product_manager
 from apps.products.dependencies import validate_image, validate_images
 from apps.products.models import Category, Product
 from apps.products.schemas import (
     NewCategory,
+    OrderSchema,
     PaginatorSavedCategoryResponseSchema,
     PaginatorSavedProductResponseSchema,
     PatchCategorySchema,
@@ -28,6 +29,11 @@ category_router = APIRouter(
 product_router = APIRouter(
     prefix="/products",
     tags=["Products"],
+)
+
+order_router = APIRouter(
+    prefix="/orders",
+    tags=["Orders"],
 )
 
 
@@ -228,3 +234,18 @@ async def get_products(
         params=params,
     )
     return result
+
+
+@order_router.get("/")
+async def get_current_order(
+    user: User = Depends(get_current_user),
+    session: AsyncSession = Depends(get_async_session),
+) -> OrderSchema:
+    order = await order_manager.get_or_create(
+        session=session,
+        user_id=user.id,
+        is_closed=False,
+    )
+
+    response = OrderSchema.from_orm(order)
+    return response
